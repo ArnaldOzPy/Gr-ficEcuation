@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualizador Científico 3D v2.0 | BIG BOSS IA</title>
+    <title>Visualizador Científico 3D v2.1 | BIG BOSS IA</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Source+Code+Pro:wght@300;600&display=swap" rel="stylesheet">
     <style>
         body { margin:0; background:#050510; color:white; font-family:'Source Code Pro', monospace; overflow:hidden; }
@@ -42,7 +42,7 @@
 </head>
 <body>
     <div id="portada">
-        <div class="titulo">SCIENTIFIC 3D EQUATION VISUALIZER v2.0</div>
+        <div class="titulo">SCIENTIFIC 3D EQUATION VISUALIZER v2.1</div>
         <div class="subtitulo">
             Motor avanzado de visualización matemática con raymarching implícito.<br>
             Validado numéricamente para investigación y docencia.<br>
@@ -76,9 +76,16 @@
             const infoDiv = document.createElement('div');
             infoDiv.id = 'info';
             infoDiv.innerHTML = `
-                <h2>⚡ Graficador Científico v2.0</h2>
+                <h2>⚡ Graficador Científico v2.1</h2>
                 <p style="margin:0 0 5px; color:#ccc; font-size:14px;">F(x, y, z) = 0</p>
                 <input type="text" id="ecuacion-input" placeholder="Ej: x*x + y*y + z*z - 4.0" value="x*x + y*y + z*z - 4.0">
+                
+                <div style="margin:10px 0;">
+                    <label for="escala" style="color:#ccc; font-size:12px;">Escala global:</label>
+                    <input type="range" id="escala" min="0.2" max="3.0" step="0.1" value="1.0" style="width:100%;">
+                    <span id="escala-valor" style="color:#00a8ff; font-size:12px; float:right;">1.0</span>
+                </div>
+
                 <div id="ejemplos" style="max-height:200px; overflow-y:auto; padding-right:5px;">
                     <strong>📌 Ejemplos científicos:</strong><br>
                     <span class="ejemplo-btn" onclick="cargarEjemplo('x*x + y*y + z*z - 4.0')">Esfera</span>
@@ -94,7 +101,7 @@
                 <div id="error"></div>
                 <p style="margin:15px 0 0; font-size:12px; color:#888;">
                     Funciones GLSL: sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, exp, log, abs, sqrt, pow<br>
-                    Notación: usar x, y, z (dominio [-3.5, 3.5])
+                    Notación: usar x, y, z. Ajusta la escala si la superficie no se ve.
                 </p>
             `;
             container.appendChild(infoDiv);
@@ -180,7 +187,7 @@
                 scene.background = new THREE.Color(0x0a0a20);
 
                 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-                camera.position.set(5, 4, 8);
+                camera.position.set(6, 5, 10); // Posición ligeramente más lejana
                 camera.lookAt(0, 0, 0);
 
                 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -255,7 +262,7 @@
                 crearEjes();
 
                 // --- Parámetros del raymarching ---
-                const boxSize = 7.0;
+                const boxSize = 8.0; // Aumentado para dar más margen
                 const geometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
 
                 // Vertex shader (sin cambios)
@@ -269,7 +276,7 @@
                     }
                 \`;
 
-                // Fragment shader CORREGIDO (origen en cámara, sin bounding box, MAX_DIST aumentado)
+                // Fragment shader MEJORADO con paso más fino y más pasos
                 const fragmentShaderBase = \`
                     precision highp float;
                     
@@ -279,16 +286,19 @@
                     uniform vec3 cameraPos;
                     uniform float time;
                     uniform mat4 modelMatrix;
+                    uniform float escalaGlobal; // Nuevo uniform para escala
                     
                     const float BOX_SIZE = \${boxSize.toFixed(1)};
-                    const float EPS = 0.001;
-                    const int MAX_STEPS = 250;
-                    const float MAX_DIST = 20.0; // Aumentado para llegar al cubo
+                    const float EPS = 0.0005;
+                    const int MAX_STEPS = 600;
+                    const float MAX_DIST = 25.0;
                     
                     float scene(vec3 p) {
-                        float x = p.x;
-                        float y = p.y;
-                        float z = p.z;
+                        // Aplicar escala global
+                        vec3 q = p / escalaGlobal;
+                        float x = q.x;
+                        float y = q.y;
+                        float z = q.z;
                         float val = {{ECUACION}};
                         return val;
                     }
@@ -324,13 +334,33 @@
                         return ambient + diffuse + specular;
                     }
                     
+                    // Intersección rayo-caja (algoritmo de slabs)
+                    bool intersectBox(vec3 ro, vec3 rd, vec3 boxMin, vec3 boxMax, out float tmin, out float tmax) {
+                        vec3 invR = 1.0 / rd;
+                        vec3 t1 = (boxMin - ro) * invR;
+                        vec3 t2 = (boxMax - ro) * invR;
+                        vec3 tsmin = min(t1, t2);
+                        vec3 tsmax = max(t1, t2);
+                        tmin = max(tsmin.x, max(tsmin.y, tsmin.z));
+                        tmax = min(tsmax.x, min(tsmax.y, tsmax.z));
+                        return tmin <= tmax && tmax >= 0.0;
+                    }
+                    
                     bool raymarch(vec3 ro, vec3 rd, out vec3 hitPos, out vec3 hitNormal) {
-                        float t = 0.0;
+                        // Bounding box del cubo
+                        vec3 boxMin = vec3(-BOX_SIZE * 0.5);
+                        vec3 boxMax = vec3( BOX_SIZE * 0.5);
+                        
+                        float tmin, tmax;
+                        if (!intersectBox(ro, rd, boxMin, boxMax, tmin, tmax)) {
+                            return false;
+                        }
+                        
+                        float t = max(tmin, 0.0);
+                        float endT = min(tmax, MAX_DIST);
+                        
                         for (int i = 0; i < MAX_STEPS; i++) {
                             vec3 p = ro + rd * t;
-                            
-                            // (Sin bounding box, confiamos en MAX_DIST)
-                            
                             float val = scene(p);
                             
                             if (abs(val) < EPS) {
@@ -339,17 +369,16 @@
                                 return true;
                             }
                             
-                            t += max(0.0005, abs(val) * 0.3);
-                            if (t > MAX_DIST) break;
+                            // Paso adaptativo más conservador (0.75)
+                            t += max(0.0003, abs(val) * 0.75);
+                            if (t > endT) break;
                         }
                         return false;
                     }
                     
                     void main() {
-                        // Transformar a espacio mundial
                         vec3 worldPos = (modelMatrix * vec4(vPosition, 1.0)).xyz;
                         
-                        // Origen en la cámara, dirección hacia el cubo
                         vec3 ro = cameraPos;
                         vec3 rd = normalize(worldPos - cameraPos);
                         
@@ -370,7 +399,8 @@
                     uniforms: {
                         cameraPos: { value: camera.position.clone() },
                         time: { value: 0 },
-                        modelMatrix: { value: new THREE.Matrix4() }
+                        modelMatrix: { value: new THREE.Matrix4() },
+                        escalaGlobal: { value: 1.0 }
                     },
                     side: THREE.DoubleSide,
                     transparent: true
@@ -378,6 +408,18 @@
 
                 const mesh = new THREE.Mesh(geometry, material);
                 scene.add(mesh);
+
+                // --- Elementos de la interfaz de escala ---
+                const escalaInput = document.getElementById('escala');
+                const escalaValor = document.getElementById('escala-valor');
+                
+                escalaInput.addEventListener('input', () => {
+                    const val = parseFloat(escalaInput.value);
+                    escalaValor.textContent = val.toFixed(1);
+                    if (material) {
+                        material.uniforms.escalaGlobal.value = val;
+                    }
+                });
 
                 // --- Funciones de actualización ---
                 window.actualizarEcuacion = function() {
@@ -411,7 +453,8 @@
                             uniforms: {
                                 cameraPos: { value: camera.position.clone() },
                                 time: { value: 0 },
-                                modelMatrix: { value: mesh.matrixWorld }
+                                modelMatrix: { value: mesh.matrixWorld },
+                                escalaGlobal: { value: parseFloat(escalaInput.value) }
                             },
                             side: THREE.DoubleSide,
                             transparent: true
