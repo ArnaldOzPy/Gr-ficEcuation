@@ -3,346 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualizador Científico 3D | BIG BOSS IA</title>
-    <!-- Fuentes modernas -->
+    <title>Visualizador Científico 3D v2.0 | BIG BOSS IA</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Source+Code+Pro:wght@300;600&display=swap" rel="stylesheet">
     <style>
-        /* Estilos globales */
-        body {
-            margin: 0;
-            background: #050510;
-            color: white;
-            font-family: 'Source Code Pro', monospace;
-            overflow: hidden;
-        }
-
-        /* --- PORTADA --- */
+        body { margin:0; background:#050510; color:white; font-family:'Source Code Pro', monospace; overflow:hidden; }
         #portada {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            background:
-                radial-gradient(circle at 20% 30%, rgba(0, 150, 255, 0.15), transparent),
-                radial-gradient(circle at 80% 70%, rgba(255, 0, 150, 0.15), transparent),
-                linear-gradient(180deg, #020210, #050520);
-            z-index: 1000;
-            transition: opacity 1s ease;
+            position:fixed; top:0; left:0; width:100%; height:100vh; display:flex; flex-direction:column;
+            justify-content:center; align-items:center; text-align:center;
+            background:radial-gradient(circle at 20% 30%, rgba(0,150,255,0.15), transparent),
+                       radial-gradient(circle at 80% 70%, rgba(255,0,150,0.15), transparent),
+                       linear-gradient(180deg,#020210,#050520);
+            z-index:1000; transition:opacity 1s ease;
         }
-
         .titulo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 60px;
-            font-weight: 700;
-            letter-spacing: 4px;
-            background: linear-gradient(90deg, #00d4ff, #ff00cc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 20px;
-            animation: glow 3s infinite alternate;
+            font-family:'Orbitron', sans-serif; font-size:60px; font-weight:700; letter-spacing:4px;
+            background:linear-gradient(90deg,#00d4ff,#ff00cc); -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent; margin-bottom:20px; animation:glow 3s infinite alternate;
         }
-
-        @keyframes glow {
-            0% { text-shadow: 0 0 10px rgba(0,212,255,0.3); }
-            100% { text-shadow: 0 0 20px rgba(255,0,204,0.5); }
-        }
-
-        .subtitulo {
-            font-size: 18px;
-            color: #aaa;
-            max-width: 600px;
-            line-height: 1.6;
-        }
-
+        @keyframes glow { 0%{text-shadow:0 0 10px rgba(0,212,255,0.3);} 100%{text-shadow:0 0 20px rgba(255,0,204,0.5);} }
+        .subtitulo { font-size:18px; color:#aaa; max-width:600px; line-height:1.6; }
         .ecuacion {
-            margin-top: 30px;
-            font-size: 28px;
-            color: #00d4ff;
-            font-family: 'Orbitron', monospace;
-            background: rgba(0,20,40,0.5);
-            padding: 10px 30px;
-            border-radius: 40px;
-            border: 1px solid #00d4ff33;
-            box-shadow: 0 0 20px #00d4ff22;
+            margin-top:30px; font-size:28px; color:#00d4ff; font-family:'Orbitron', monospace;
+            background:rgba(0,20,40,0.5); padding:10px 30px; border-radius:40px;
+            border:1px solid #00d4ff33; box-shadow:0 0 20px #00d4ff22;
         }
-
         .boton {
-            margin-top: 40px;
-            padding: 15px 40px;
-            font-size: 18px;
-            font-family: 'Orbitron', sans-serif;
-            background: linear-gradient(90deg, #0066ff, #00ccff);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            transition: 0.3s;
-            border: 1px solid rgba(255,255,255,0.2);
-            font-weight: 600;
-            letter-spacing: 1px;
+            margin-top:40px; padding:15px 40px; font-size:18px; font-family:'Orbitron', sans-serif;
+            background:linear-gradient(90deg,#0066ff,#00ccff); border:none; border-radius:8px;
+            color:white; cursor:pointer; transition:0.3s; border:1px solid rgba(255,255,255,0.2);
+            font-weight:600; letter-spacing:1px;
         }
-
-        .boton:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(0,150,255,0.6);
-            background: linear-gradient(90deg, #0077ff, #00ddff);
-        }
-
-        .creditos-portada {
-            position: absolute;
-            bottom: 20px;
-            font-size: 14px;
-            color: #666;
-        }
-
-        /* --- CONTENEDOR DEL GRAFICADOR (oculto inicialmente) --- */
-        #graficador-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 1s ease;
-            background: #111122;
-        }
-
-        #graficador-container.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Pequeño ajuste para que el canvas de Three.js ocupe todo */
-        canvas {
-            display: block;
-        }
+        .boton:hover { transform:scale(1.1); box-shadow:0 0 20px rgba(0,150,255,0.6); background:linear-gradient(90deg,#0077ff,#00ddff); }
+        .creditos-portada { position:absolute; bottom:20px; font-size:14px; color:#666; }
+        #graficador-container { position:fixed; top:0; left:0; width:100%; height:100vh; opacity:0; visibility:hidden; transition:opacity 1s ease; background:#111122; }
+        #graficador-container.visible { opacity:1; visibility:visible; }
+        canvas { display:block; }
     </style>
 </head>
 <body>
-
-    <!-- PORTADA -->
     <div id="portada">
-        <div class="titulo">
-            SCIENTIFIC 3D EQUATION VISUALIZER
-        </div>
+        <div class="titulo">SCIENTIFIC 3D EQUATION VISUALIZER v2.0</div>
         <div class="subtitulo">
-            Motor avanzado de visualización matemática capaz de representar<br>
-            superficies 3D a partir de ecuaciones arbitrarias mediante<br>
-            computación geométrica en tiempo real.<br>
-            Compatible con funciones explícitas e implícitas.
+            Motor avanzado de visualización matemática con raymarching implícito.<br>
+            Validado numéricamente para investigación y docencia.<br>
+            Superficies definidas por F(x,y,z)=0.
         </div>
-        <div class="ecuacion">
-            F(x,y,z) = 0
-        </div>
-        <button class="boton" onclick="iniciarVisualizador()">
-            INICIAR VISUALIZADOR
-        </button>
-        <div class="creditos-portada">
-            Desarrollado por BIG BOSS IA · Paraguay · 2026
-        </div>
+        <div class="ecuacion">F(x,y,z) = 0</div>
+        <button class="boton" onclick="iniciarVisualizador()">INICIAR VISUALIZADOR</button>
+        <div class="creditos-portada">Desarrollado por BIG BOSS IA · Paraguay · 2026</div>
     </div>
-
-    <!-- CONTENEDOR DEL GRAFICADOR (invisible al inicio) -->
-    <div id="graficador-container">
-        <!-- Aquí se inyectará el graficador vía JavaScript -->
-    </div>
+    <div id="graficador-container"></div>
 
     <script>
-        // Función para ocultar la portada y mostrar el graficador
         function iniciarVisualizador() {
             const portada = document.getElementById('portada');
             const contenedor = document.getElementById('graficador-container');
-
-            // Animación de salida de la portada
             portada.style.opacity = '0';
             setTimeout(() => {
                 portada.style.display = 'none';
                 contenedor.classList.add('visible');
-            }, 1000); // coincide con la transición CSS
-
-            // Inicializar el graficador si aún no se ha hecho
+            }, 1000);
             if (!window.graficadorIniciado) {
                 window.graficadorIniciado = true;
                 iniciarGraficador();
             }
         }
 
-        // Función que construye todo el graficador dentro del contenedor
         function iniciarGraficador() {
             const container = document.getElementById('graficador-container');
 
-            // Crear elementos de interfaz del graficador (similar a la versión anterior)
+            // ---- INTERFAZ DE USUARIO ----
             const infoDiv = document.createElement('div');
             infoDiv.id = 'info';
             infoDiv.innerHTML = `
-                <h2>⚡ Graficador de Ecuaciones Implícitas</h2>
-                <p style="margin:0 0 5px; color:#ccc; font-size:14px;">Ingresa F(x, y, z) = 0</p>
+                <h2>⚡ Graficador Científico v2.0</h2>
+                <p style="margin:0 0 5px; color:#ccc; font-size:14px;">F(x, y, z) = 0</p>
                 <input type="text" id="ecuacion-input" placeholder="Ej: x*x + y*y + z*z - 4.0" value="x*x + y*y + z*z - 4.0">
-                <div id="ejemplos">
-                    <strong>📌 Ejemplos:</strong><br>
+                <div id="ejemplos" style="max-height:200px; overflow-y:auto; padding-right:5px;">
+                    <strong>📌 Ejemplos científicos:</strong><br>
                     <span class="ejemplo-btn" onclick="cargarEjemplo('x*x + y*y + z*z - 4.0')">Esfera</span>
                     <span class="ejemplo-btn" onclick="cargarEjemplo('(sqrt(x*x+y*y)-2.0)*(sqrt(x*x+y*y)-2.0) + z*z - 0.5')">Toro</span>
                     <span class="ejemplo-btn" onclick="cargarEjemplo('x*x + y*y - z')">Paraboloide</span>
                     <span class="ejemplo-btn" onclick="cargarEjemplo('sin(x*y*z)')">Campo seno</span>
-                    <span class="ejemplo-btn" onclick="cargarEjemplo('x*x - y*y + z*z - 2.0')">Hiperboloide</span>
+                    <span class="ejemplo-btn" onclick="cargarEjemplo('exp(-x*x-y*y-z*z) - 0.3')">Gaussiana</span>
+                    <span class="ejemplo-btn" onclick="cargarEjemplo('x*x - y*y - z')">Silla</span>
+                    <span class="ejemplo-btn" onclick="cargarEjemplo('x*x + 2.0*y*y - 3.0*z*z - 1.0')">Hiperboloide</span>
+                    <span class="ejemplo-btn" onclick="cargarEjemplo('x*y*z - 0.2')">Superficie cúbica</span>
                 </div>
                 <button onclick="actualizarEcuacion()">🔄 Renderizar</button>
                 <div id="error"></div>
                 <p style="margin:15px 0 0; font-size:12px; color:#888;">
-                    Funciones: sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, exp, log, abs, sqrt, pow (usa Math.pow(a,b) o a**b).<br>
-                    Variables: x, y, z (rango [-3.5, 3.5] aprox).
+                    Funciones GLSL: sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, exp, log, abs, sqrt, pow<br>
+                    Notación: usar x, y, z (dominio [-3.5, 3.5])
                 </p>
             `;
             container.appendChild(infoDiv);
 
             const controlesDiv = document.createElement('div');
             controlesDiv.id = 'controles';
-            controlesDiv.innerHTML = `🖱️ Rotar: arrastrar | Zoom: rueda | Pan: Shift+arrastrar`;
+            controlesDiv.innerHTML = '🖱️ Rotar: arrastrar | Zoom: rueda | Pan: Shift+arrastrar';
             container.appendChild(controlesDiv);
 
             const creditosDiv = document.createElement('div');
             creditosDiv.id = 'creditos';
-            creditosDiv.innerHTML = `Basado en <a href="https://informaticabigbosspy.blogspot.com" target="_blank">informaticabigbosspy.blogspot.com</a>`;
+            creditosDiv.innerHTML = 'Basado en <a href="https://informaticabigbosspy.blogspot.com" target="_blank">informaticabigbosspy.blogspot.com</a>';
             container.appendChild(creditosDiv);
 
-            // Añadir estilos específicos para el graficador (se inyectan en el head)
+            // Estilos del panel
             const style = document.createElement('style');
             style.textContent = `
                 #info {
-                    position: absolute;
-                    top: 20px;
-                    left: 20px;
-                    background: rgba(0, 0, 0, 0.85);
-                    color: white;
-                    padding: 20px;
-                    border-radius: 10px;
-                    z-index: 100;
-                    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-                    border-left: 4px solid #00a8ff;
-                    max-width: 340px;
-                    backdrop-filter: blur(8px);
-                    pointer-events: all;
-                    font-family: 'Source Code Pro', monospace;
+                    position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.85); color: white;
+                    padding: 20px; border-radius: 10px; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+                    border-left: 4px solid #00a8ff; max-width: 360px; backdrop-filter: blur(8px);
+                    pointer-events: all; font-family: 'Source Code Pro', monospace; max-height: 80vh; overflow-y: auto;
                 }
-                #info h2 {
-                    margin-top: 0;
-                    color: #00a8ff;
-                    font-weight: 400;
-                    border-bottom: 1px solid #333;
-                    padding-bottom: 8px;
-                }
+                #info h2 { margin-top:0; color:#00a8ff; border-bottom:1px solid #333; padding-bottom:8px; }
                 #ecuacion-input {
-                    width: 100%;
-                    padding: 12px;
-                    margin: 12px 0;
-                    background: rgba(20, 20, 30, 0.9);
-                    border: 1px solid #444;
-                    color: #fff;
-                    border-radius: 6px;
-                    font-family: 'Courier New', monospace;
-                    font-size: 15px;
-                    box-sizing: border-box;
+                    width:100%; padding:12px; margin:12px 0; background:rgba(20,20,30,0.9);
+                    border:1px solid #444; color:#fff; border-radius:6px; font-family:'Courier New', monospace;
+                    font-size:15px; box-sizing:border-box;
                 }
-                #ecuacion-input:focus {
-                    outline: none;
-                    border-color: #00a8ff;
-                    box-shadow: 0 0 0 2px rgba(0,168,255,0.2);
-                }
+                #ecuacion-input:focus { outline:none; border-color:#00a8ff; box-shadow:0 0 0 2px rgba(0,168,255,0.2); }
                 button {
-                    background: #00a8ff;
-                    color: white;
-                    border: none;
-                    padding: 12px 20px;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    font-weight: 600;
-                    width: 100%;
-                    font-size: 16px;
-                    transition: background 0.2s, transform 0.1s;
-                    letter-spacing: 0.5px;
+                    background:#00a8ff; color:white; border:none; padding:12px 20px; border-radius:6px;
+                    cursor:pointer; font-weight:600; width:100%; font-size:16px; transition:0.2s;
                 }
-                button:hover {
-                    background: #0090e0;
-                }
-                button:active {
-                    transform: scale(0.98);
-                }
+                button:hover { background:#0090e0; }
                 #error {
-                    color: #ff6b6b;
-                    margin-top: 12px;
-                    font-size: 14px;
-                    display: none;
-                    background: rgba(255,0,0,0.1);
-                    padding: 8px;
-                    border-radius: 4px;
-                    border-left: 3px solid #ff6b6b;
+                    color:#ff6b6b; margin-top:12px; font-size:14px; display:none;
+                    background:rgba(255,0,0,0.1); padding:8px; border-radius:4px; border-left:3px solid #ff6b6b;
                 }
-                #ejemplos {
-                    margin-top: 18px;
-                    font-size: 13px;
-                    color: #aaa;
-                }
+                #ejemplos { margin-top:18px; font-size:13px; color:#aaa; }
                 .ejemplo-btn {
-                    background: #2a2a3a;
-                    color: #ddd;
-                    border: 1px solid #444;
-                    padding: 6px 12px;
-                    border-radius: 20px;
-                    cursor: pointer;
-                    font-size: 12px;
-                    margin: 4px 4px 0 0;
-                    display: inline-block;
-                    transition: all 0.2s;
+                    background:#2a2a3a; color:#ddd; border:1px solid #444; padding:6px 12px;
+                    border-radius:20px; cursor:pointer; font-size:12px; margin:4px 4px 0 0;
+                    display:inline-block; transition:0.2s;
                 }
-                .ejemplo-btn:hover {
-                    background: #3a4a6a;
-                    border-color: #00a8ff;
-                    color: white;
-                }
+                .ejemplo-btn:hover { background:#3a4a6a; border-color:#00a8ff; color:white; }
                 #controles {
-                    position: absolute;
-                    bottom: 20px;
-                    left: 20px;
-                    color: rgba(255,255,255,0.7);
-                    font-size: 13px;
-                    z-index: 100;
-                    background: rgba(0,0,0,0.5);
-                    padding: 8px 16px;
-                    border-radius: 30px;
-                    backdrop-filter: blur(4px);
-                    pointer-events: none;
+                    position:absolute; bottom:20px; left:20px; color:rgba(255,255,255,0.7); font-size:13px;
+                    z-index:100; background:rgba(0,0,0,0.5); padding:8px 16px; border-radius:30px;
+                    backdrop-filter:blur(4px); pointer-events:none;
                 }
                 #creditos {
-                    position: absolute;
-                    bottom: 20px;
-                    right: 20px;
-                    color: rgba(255,255,255,0.5);
-                    font-size: 13px;
-                    z-index: 100;
-                    background: rgba(0,0,0,0.5);
-                    padding: 8px 16px;
-                    border-radius: 30px;
-                    backdrop-filter: blur(4px);
+                    position:absolute; bottom:20px; right:20px; color:rgba(255,255,255,0.5); font-size:13px;
+                    z-index:100; background:rgba(0,0,0,0.5); padding:8px 16px; border-radius:30px;
+                    backdrop-filter:blur(4px);
                 }
-                #creditos a {
-                    color: #00a8ff;
-                    text-decoration: none;
-                    font-weight: 500;
-                }
-                #creditos a:hover {
-                    text-decoration: underline;
-                }
+                #creditos a { color:#00a8ff; text-decoration:none; font-weight:500; }
+                #creditos a:hover { text-decoration:underline; }
             `;
             document.head.appendChild(style);
 
-            // --- Importar Three.js y dependencias ---
+            // ---- IMPORTACIÓN DE THREE.JS ----
             const scriptMap = document.createElement('script');
             scriptMap.type = 'importmap';
             scriptMap.textContent = JSON.stringify({
@@ -353,7 +167,7 @@
             });
             document.head.appendChild(scriptMap);
 
-            // --- Script principal del graficador (adaptado) ---
+            // ---- CÓDIGO PRINCIPAL DEL GRAFICADOR (MÓDULO) ----
             const scriptGraficador = document.createElement('script');
             scriptGraficador.type = 'module';
             scriptGraficador.textContent = `
@@ -361,7 +175,7 @@
                 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
                 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
-                // --- Escena, cámara, renderers ---
+                // --- Configuración de escena ---
                 const scene = new THREE.Scene();
                 scene.background = new THREE.Color(0x0a0a20);
 
@@ -391,11 +205,11 @@
                 controls.rotateSpeed = 0.8;
                 controls.zoomSpeed = 1.2;
 
-                // --- Luces (ambientales) ---
+                // --- Luces ---
                 const ambientLight = new THREE.AmbientLight(0x404060);
                 scene.add(ambientLight);
-                
-                // --- Estrellas de fondo ---
+
+                // --- Fondo estelar ---
                 const starsGeometry = new THREE.BufferGeometry();
                 const starsCount = 2000;
                 const starsPositions = new Float32Array(starsCount * 3);
@@ -409,7 +223,7 @@
                 const stars = new THREE.Points(starsGeometry, starsMaterial);
                 scene.add(stars);
 
-                // --- Ejes y etiquetas ---
+                // --- Ejes con etiquetas ---
                 function crearEjes() {
                     const length = 5.5;
                     const headLength = 0.3;
@@ -444,6 +258,7 @@
                 const boxSize = 7.0;
                 const geometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
 
+                // Vertex shader (con modelMatrix para transformación correcta)
                 const vertexShader = \`
                     varying vec3 vPosition;
                     varying vec2 vUv;
@@ -454,6 +269,7 @@
                     }
                 \`;
 
+                // Fragment shader con las mejoras críticas
                 const fragmentShaderBase = \`
                     precision highp float;
                     
@@ -462,13 +278,17 @@
                     
                     uniform vec3 cameraPos;
                     uniform float time;
+                    uniform mat4 modelMatrix;
                     
                     const float BOX_SIZE = \${boxSize.toFixed(1)};
                     const float EPS = 0.001;
-                    const int MAX_STEPS = 200;
+                    const int MAX_STEPS = 250;  // Aumentado para mayor precisión
                     const float MAX_DIST = 10.0;
                     
                     float scene(vec3 p) {
+                        float x = p.x;
+                        float y = p.y;
+                        float z = p.z;
                         float val = {{ECUACION}};
                         return val;
                     }
@@ -508,6 +328,10 @@
                         float t = 0.0;
                         for (int i = 0; i < MAX_STEPS; i++) {
                             vec3 p = ro + rd * t;
+                            
+                            // Mejora #2: bounding box real
+                            if (any(greaterThan(abs(p), vec3(BOX_SIZE*0.5)))) break;
+                            
                             float val = scene(p);
                             
                             if (abs(val) < EPS) {
@@ -516,16 +340,19 @@
                                 return true;
                             }
                             
-                            t += max(0.001, abs(val) * 0.5);
+                            // Mejora #3: paso más fino para mejor convergencia
+                            t += max(0.0005, abs(val) * 0.3);
                             if (t > MAX_DIST) break;
                         }
                         return false;
                     }
                     
                     void main() {
-                        vec3 posLocal = vPosition;
+                        // Mejora #1: transformación correcta a espacio mundial
+                        vec3 worldPos = (modelMatrix * vec4(vPosition, 1.0)).xyz;
+                        
                         vec3 ro = cameraPos;
-                        vec3 rd = normalize(posLocal - ro);
+                        vec3 rd = normalize(worldPos - cameraPos);
                         
                         vec3 hitPos, hitNormal;
                         if (raymarch(ro, rd, hitPos, hitNormal)) {
@@ -537,13 +364,14 @@
                     }
                 \`;
 
-                // Material inicial (esfera por defecto)
+                // Material inicial
                 let material = new THREE.ShaderMaterial({
                     vertexShader: vertexShader,
                     fragmentShader: fragmentShaderBase.replace('{{ECUACION}}', 'x*x + y*y + z*z - 4.0'),
                     uniforms: {
                         cameraPos: { value: camera.position.clone() },
-                        time: { value: 0 }
+                        time: { value: 0 },
+                        modelMatrix: { value: new THREE.Matrix4() }
                     },
                     side: THREE.DoubleSide,
                     transparent: true
@@ -552,7 +380,7 @@
                 const mesh = new THREE.Mesh(geometry, material);
                 scene.add(mesh);
 
-                // --- Funciones de actualización (accesibles globalmente) ---
+                // --- Funciones de actualización ---
                 window.actualizarEcuacion = function() {
                     const ecuacionRaw = document.getElementById('ecuacion-input').value;
                     
@@ -583,7 +411,8 @@
                             fragmentShader: nuevoFragmentShader,
                             uniforms: {
                                 cameraPos: { value: camera.position.clone() },
-                                time: { value: 0 }
+                                time: { value: 0 },
+                                modelMatrix: { value: mesh.matrixWorld }
                             },
                             side: THREE.DoubleSide,
                             transparent: true
@@ -593,7 +422,7 @@
                         document.getElementById('error').style.display = 'none';
                     } catch (e) {
                         document.getElementById('error').style.display = 'block';
-                        document.getElementById('error').textContent = 'Error en la ecuación: ' + e.message;
+                        document.getElementById('error').textContent = 'Error: ' + e.message;
                     }
                 };
 
@@ -605,18 +434,17 @@
                 // --- Animación ---
                 function animate() {
                     requestAnimationFrame(animate);
-
+                    
                     if (material) {
                         material.uniforms.cameraPos.value.copy(camera.position);
                         material.uniforms.time.value += 0.01;
+                        material.uniforms.modelMatrix.value.copy(mesh.matrixWorld);
                     }
-
-                    controls.update();
                     
+                    controls.update();
                     renderer.render(scene, camera);
                     labelRenderer.render(scene, camera);
                 }
-
                 animate();
 
                 // --- Resize ---
@@ -627,12 +455,9 @@
                     labelRenderer.setSize(window.innerWidth, window.innerHeight);
                 });
 
-                // Cargar ejemplo por defecto
-                setTimeout(() => {
-                    actualizarEcuacion();
-                }, 100);
+                // Inicializar
+                setTimeout(() => actualizarEcuacion(), 100);
             `;
-
             container.appendChild(scriptGraficador);
         }
     </script>
